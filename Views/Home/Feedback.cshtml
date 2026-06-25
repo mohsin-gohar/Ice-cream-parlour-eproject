@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback - iCREAM Ice Cream</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/style.css">
+</head>
+<body>
+
+    <div class="feedback-wrapper">
+        <div class="feedback-header">
+            <span class="feedback-badge">We Value Your Feedback</span>
+            <h1>Share Your <span>Ice Cream</span> Experience</h1>
+            <p class="feedback-subtext">Aapka feedback hamare liye bohot keemti hai...</p>
+        </div>
+
+        <form class="icream-feedback-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" placeholder="Enter your full name" required />
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" placeholder="Enter your email" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-ice-cream"></i> Which flavor did you try?</label>
+                <select required>
+                    <option value="">Select your favorite flavor</option>
+                    <option value="vanilla">Madagascar Vanilla</option>
+                    <option value="chocolate">Belgian Dark Chocolate</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-star"></i> Rate Your Experience</label>
+                <div class="star-rating-box">
+                    <input type="radio" name="rating" id="star5" value="5" />
+                    <label for="star5">★</label>
+                    <input type="radio" name="rating" id="star4" value="4" />
+                    <label for="star4">★</label>
+                    <input type="radio" name="rating" id="star3" value="3" />
+                    <label for="star3">★</label>
+                    <input type="radio" name="rating" id="star2" value="2" />
+                    <label for="star2">★</label>
+                    <input type="radio" name="rating" id="star1" value="1" />
+                    <label for="star1">★</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Your Review / Comments</label>
+                <textarea rows="4" placeholder="Tell us what you loved or how we can improve..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-feedback-submit">
+                <i class="fas fa-paper-plane"></i> Submit Feedback
+            </button>
+        </form>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script src="~/js/main.js"></script>
+
+</body>
+</html>

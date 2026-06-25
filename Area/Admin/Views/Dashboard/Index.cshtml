@@ -1,0 +1,108 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header" data-aos="fade-down">
+    <div>
+        <h2>Dashboard</h2>
+        <p>Welcome back! Here's what's happening at iCREAM today.</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Orders" asp-action="Create" class="btn btn-primary-custom">
+        <i class="fas fa-plus me-2"></i>New Order
+    </a>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="stat-icon pink"><i class="fas fa-shopping-bag"></i></div>
+        <div class="stat-info"><h3>@Model.TotalOrders</h3><p>Total Orders</p></div>
+    </div>
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        <div class="stat-info"><h3>@Model.TotalCustomers</h3><p>Total Customers</p></div>
+    </div>
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-icon green"><i class="fas fa-ice-cream"></i></div>
+        <div class="stat-info"><h3>@Model.TotalProducts</h3><p>Total Products</p></div>
+    </div>
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-icon orange"><i class="fas fa-tags"></i></div>
+        <div class="stat-info"><h3>@Model.TotalCategories</h3><p>Categories</p></div>
+    </div>
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="stat-icon purple"><i class="fas fa-dollar-sign"></i></div>
+        <div class="stat-info"><h3>$@Model.TodaySales.ToString("N0")</h3><p>Today's Sales</p></div>
+    </div>
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="500">
+        <div class="stat-icon teal"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-info"><h3>$@Model.MonthlySales.ToString("N0")</h3><p>Monthly Sales</p></div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="chart-card" data-aos="fade-right">
+        <h5><i class="fas fa-chart-area me-2 text-primary"></i>Revenue Overview (Last 7 Days)</h5>
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    <div class="glass-card" data-aos="fade-left">
+        <h5 class="mb-3"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Low Stock Alert</h5>
+        @if (Model.LowStockProducts.Any())
+        {
+            @foreach (var item in Model.LowStockProducts)
+            {
+                <div class="stock-item">
+                    <div class="stock-item-info">
+                        <h6>@item.Name</h6>
+                        <small>@item.StockQuantity / @item.LowStockThreshold units</small>
+                    </div>
+                    <div class="progress-custom" style="width:80px">
+                        <div class="progress-bar" style="width:@item.StockPercent%;background:@(item.StockPercent < 50 ? "#ef476f" : "#ffb703")"></div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state py-3"><i class="fas fa-check-circle text-success"></i><p>All products well stocked!</p></div>
+        }
+    </div>
+</div>
+
+<div class="table-card" data-aos="fade-up">
+    <div class="table-header">
+        <h5><i class="fas fa-fire me-2 text-danger"></i>Top Selling Products</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-premium mb-0">
+            <thead>
+                <tr><th>Product</th><th>Units Sold</th><th>Revenue</th><th>Performance</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.TopSellingProducts)
+                {
+                    <tr>
+                        <td data-label="Product"><strong>@p.ProductName</strong></td>
+                        <td data-label="Sold">@p.TotalSold</td>
+                        <td data-label="Revenue">$@p.Revenue.ToString("N2")</td>
+                        <td data-label="Performance">
+                            <div class="progress-labeled">
+                                <div class="progress-custom"><div class="progress-bar" style="width:@p.ProgressPercent%"></div></div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var labels = @Html.Raw(Model.RevenueChartLabels);
+    var data = @Html.Raw(Model.RevenueChartData);
+    createRevenueChart('revenueChart', labels, data);
+</script>
+}
