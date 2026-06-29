@@ -1,15 +1,25 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Ice_Cream_Parlour_Eproject.Areas.Admin.Controllers;
 using Ice_Cream_Parlour_Eproject.Data;
 using Ice_Cream_Parlour_Eproject.Models;
+using Ice_Cream_Parlour_Eproject.Services;     
+using Ice_Cream_Parlour_Eproject.Services.Interfaces;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ===== Database Context =====
-var provider = builder.Services.BuildServiceProvider();
-var config = provider.GetRequiredService<IConfiguration>();
-builder.Services.AddDbContext<Ice_Cream_Parlour_Eproject.Data.ApplicationDbContext>(item =>
-item.UseSqlServer(config.GetConnectionString("icecreamcs")));
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("icecreamcs")));
+
+// ===== Register Services =====
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // ===== Identity with Roles =====
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -22,8 +32,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.User.RequireUniqueEmail = true;
     options.SignIn.RequireConfirmedEmail = false;
 })
-.AddEntityFrameworkStores<ApplicationDbContext>()  
+.AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+
 // ===== Session =====
 builder.Services.AddSession(options =>
 {
@@ -35,8 +46,6 @@ builder.Services.AddSession(options =>
 // ===== MVC =====
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
-// ===== HttpContext Accessor =====
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -50,9 +59,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
@@ -60,7 +67,7 @@ app.UseSession();
 // ===== Routes =====
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
@@ -74,17 +81,13 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-    // Create Roles
     string[] roles = { "Admin", "User" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
-        {
             await roleManager.CreateAsync(new IdentityRole(role));
-        }
     }
 
-    // Create Admin User
     var adminEmail = "admin@icream.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
@@ -102,9 +105,7 @@ using (var scope = app.Services.CreateScope())
         };
         var result = await userManager.CreateAsync(adminUser, "Admin@123");
         if (result.Succeeded)
-        {
             await userManager.AddToRoleAsync(adminUser, "Admin");
-        }
     }
 }
 

@@ -31,7 +31,7 @@ namespace Ice_Cream_Parlour_Eproject.Controllers
                 if (User.Identity.IsAuthenticated)
                 {
                     feedback.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    feedback.UserName = User.Identity.Name ?? "User";
+                    feedback.UserName = User.Identity?.Name ?? "User";
                     feedback.IsRegistered = true;
                 }
                 else

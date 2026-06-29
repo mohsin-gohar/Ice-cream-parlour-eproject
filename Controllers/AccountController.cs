@@ -35,7 +35,7 @@ namespace Ice_Cream_Parlour_Eproject.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl);
+                    return await RedirectToLocal(returnUrl);    
                 }
                 ModelState.AddModelError("", "Invalid login attempt.");
             }
@@ -145,17 +145,20 @@ namespace Ice_Cream_Parlour_Eproject.Controllers
         }
 
         // ===== ACCESS DENIED =====
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
-
-        private IActionResult RedirectToLocal(string? returnUrl)
+        private async Task<IActionResult> RedirectToLocal(string? returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            }
+
             return RedirectToAction("Index", "Home");
         }
     }

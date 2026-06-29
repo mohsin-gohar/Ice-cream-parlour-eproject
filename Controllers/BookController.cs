@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Ice_Cream_Parlour_Eproject.Data;
 using Ice_Cream_Parlour_Eproject.Models;
+using Ice_Cream_Parlour_Eproject.Models.Entities;
 
 namespace Ice_Cream_Parlour_Eproject.Controllers
 {
