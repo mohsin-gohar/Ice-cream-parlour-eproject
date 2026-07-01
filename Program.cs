@@ -1,18 +1,18 @@
 using Ice_Cream_Parlour_Eproject.Areas.Admin.Controllers;
 using Ice_Cream_Parlour_Eproject.Data;
 using Ice_Cream_Parlour_Eproject.Models;
-using Ice_Cream_Parlour_Eproject.Services;     
+using Ice_Cream_Parlour_Eproject.Services;
 using Ice_Cream_Parlour_Eproject.Services.Interfaces;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ===== Database Context =====
-
+var provider = builder.Services.BuildServiceProvider();
+var config = provider.GetRequiredService<IConfiguration>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("icecreamcs")));
+    options.UseSqlServer(config.GetConnectionString("icecreamcs")));
 
 // ===== Register Services =====
 builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -67,7 +67,7 @@ app.UseSession();
 // ===== Routes =====
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
@@ -75,12 +75,13 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-// ===== Seed Roles and Admin =====
+// ===== Seed Roles and Users =====
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
+    // --- Create Roles ---
     string[] roles = { "Admin", "User" };
     foreach (var role in roles)
     {
@@ -88,6 +89,7 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
+    // --- Create Admin User ---
     var adminEmail = "admin@icream.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
@@ -106,6 +108,27 @@ using (var scope = app.Services.CreateScope())
         var result = await userManager.CreateAsync(adminUser, "Admin@123");
         if (result.Succeeded)
             await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+
+    // --- Create Regular User ---
+    var userEmail = "user@icream.com";
+    var regularUser = await userManager.FindByEmailAsync(userEmail);
+    if (regularUser == null)
+    {
+        regularUser = new User
+        {
+            UserName = userEmail,
+            Email = userEmail,
+            FullName = "Regular User",
+            Address = "User Address",
+            IsPaid = false,
+            PaymentType = "Monthly",
+            PaymentDate = DateTime.Now,
+            PaymentExpiry = DateTime.Now.AddMonths(1)
+        };
+        var result = await userManager.CreateAsync(regularUser, "User@123");
+        if (result.Succeeded)
+            await userManager.AddToRoleAsync(regularUser, "User");
     }
 }
 

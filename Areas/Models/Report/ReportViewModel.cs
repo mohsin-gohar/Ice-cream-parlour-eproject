@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Ice_Cream_Parlour_Eproject.Models.Report
+namespace Ice_Cream_Parlour_Eproject.Areas.Models.Report
 {
     // ===== REPORT VIEW MODEL =====
     public class ReportViewModel

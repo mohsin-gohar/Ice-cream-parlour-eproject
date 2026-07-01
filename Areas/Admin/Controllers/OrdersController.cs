@@ -1,6 +1,7 @@
+using Ice_Cream_Parlour_Eproject.Areas.Models.Enums;
+using Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels;
 using Ice_Cream_Parlour_Eproject.Helpers;
-using Ice_Cream_Parlour_Eproject.Models;
-using Ice_Cream_Parlour_Eproject.Services;         
+using Ice_Cream_Parlour_Eproject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

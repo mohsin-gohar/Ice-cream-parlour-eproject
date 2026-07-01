@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Ice_Cream_Parlour_Eproject.Models
+namespace Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels
 {
     public class ReportViewModel
     {

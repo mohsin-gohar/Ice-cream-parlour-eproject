@@ -1,6 +1,6 @@
+using Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels;
 using Ice_Cream_Parlour_Eproject.Helpers;
 using Ice_Cream_Parlour_Eproject.Models;
-using Ice_Cream_Parlour_Eproject.Models.ViewModels;
 using Ice_Cream_Parlour_Eproject.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

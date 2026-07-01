@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Ice_Cream_Parlour_Eproject.Models.ViewModels
+namespace Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels
 {
     // ===== DASHBOARD VIEW MODEL =====
     public class DashboardViewModel

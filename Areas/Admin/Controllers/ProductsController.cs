@@ -1,136 +1,152 @@
-using Ice_Cream_Parlour_Eproject.Helpers;
-using Ice_Cream_Parlour_Eproject.Models;
-using Ice_Cream_Parlour_Eproject.Models.Entities;
-using Ice_Cream_Parlour_Eproject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Ice_Cream_Parlour_Eproject.Data;
+using Ice_Cream_Parlour_Eproject.Models;
 
-namespace Ice_Cream_Parlour_Eproject.Areas.Admin.Controllers;
-
-[Area("Admin")]
-[Authorize(Roles = AppRoles.AllStaff)]
-public class ProductsController : Controller
+namespace Ice_Cream_Parlour_Eproject.Areas.Admin.Controllers
 {
-    private readonly IProductService _productService;
-
-    public ProductsController(IProductService productService)
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
+    public class ProductsController : Controller
     {
-        _productService = productService;
-    }
 
-    // ===== INDEX =====
-    public async Task<IActionResult> Index(string? search, int? categoryId, int page = 1)
-    {
-        ViewData["Title"] = "Products";
-        var model = await _productService.GetPagedAsync(search, categoryId, page, 10);
-        return View(model);
-    }
+        private readonly ApplicationDbContext dbcontext;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-    // ===== CREATE (GET) =====
-    public async Task<IActionResult> Create()
-    {
-        ViewData["Title"] = "Add Product";
-
-        // ✅ Generate next product code (e.g., 001, 002, ...)
-        var lastProduct = await _productService.GetLastProductAsync();
-        int nextNumber = 1;
-        if (lastProduct != null && !string.IsNullOrEmpty(lastProduct.ProductCode))
+        // ✅ Constructor - DbContext aur WebHostEnvironment inject karein
+        public ProductsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ApplicationDbContext dbcontext)
         {
-            if (int.TryParse(lastProduct.ProductCode, out int lastNum))
-                nextNumber = lastNum + 1;
-        }
-        string productCode = nextNumber.ToString("D3");
-
-        var model = new ProductViewModel
-        {
-            ProductCode = productCode
-        };
-
-        ViewBag.Categories = await _productService.GetCategoriesAsync();
-        return View(model);
-    }
-
-    // ===== CREATE (POST) =====
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(ProductViewModel model)
-    {
-        ViewBag.Categories = await _productService.GetCategoriesAsync();
-
-        if (!ModelState.IsValid)
-        {
-            return View(model);
+            this.webHostEnvironment = webHostEnvironment;
+            this.dbcontext = context;
         }
 
-        try
+        // ============================================================
+        // 1️⃣ INDEX - Sab products ki list dikhana
+        // ============================================================
+        public async Task<IActionResult> Index()
         {
-            await _productService.CreateAsync(model, HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
-            TempData["Success"] = "Product created successfully!";
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex)
-        {
-            ModelState.AddModelError("", $"Error: {ex.Message}");
-            return View(model);
-        }
-    }
-
-    // ===== EDIT (GET) =====
-    public async Task<IActionResult> Edit(int id)
-    {
-        var model = await _productService.GetByIdAsync(id);
-        if (model == null) return NotFound();
-
-        ViewData["Title"] = "Edit Product";
-        ViewBag.Categories = await _productService.GetCategoriesAsync();
-        return View(model);
-    }
-
-    // ===== EDIT (POST) =====
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ProductViewModel model)
-    {
-        ViewBag.Categories = await _productService.GetCategoriesAsync();
-
-        if (!ModelState.IsValid)
-        {
-            return View(model);
+            // ✅ Database se saare recipes (products) fetch karo
+            var products = await dbcontext.Recipes.ToListAsync();
+            return View(products);
         }
 
-        try
+        // ============================================================
+        // 2️⃣ CREATE - Naya product add karna (GET)
+        // ============================================================
+        [HttpGet]
+        public IActionResult Create()
         {
-            if (!await _productService.UpdateAsync(model, HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>()))
+            return View();
+        }
+
+        // ============================================================
+        // 3️⃣ CREATE - Naya product save karna (POST)
+        // ============================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Recipe recipe, IFormFile? ImageFile)
+        {
+            // ✅ Validation check
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
+                // ✅ Image Upload (agar image select ki hai to)
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    string folder = "images/recipes/";
+                    string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                    string fullPath = Path.Combine(webHostEnvironment.WebRootPath, folder, fileName);
 
-            TempData["Success"] = "Product updated successfully!";
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    recipe.ImagePath = "/" + folder + fileName;
+                }
+
+                // ✅ CreatedDate set karo
+                recipe.CreatedDate = DateTime.Now;
+
+                // ✅ Database mein add karo
+                dbcontext.Recipes.Add(recipe);
+                await dbcontext.SaveChangesAsync();
+
+                TempData["Success"] = "Product added successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(recipe);
+        }
+
+        // ============================================================
+        // 4️⃣ EDIT - Product edit karna (GET)
+        // ============================================================
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await dbcontext.Recipes.FindAsync(id);
+            if (product == null)
+                return NotFound();
+            return View(product);
+        }
+
+        // ============================================================
+        // 5️⃣ EDIT - Product update karna (POST)
+        // ============================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Recipe recipe, IFormFile? ImageFile)
+        {
+            if (ModelState.IsValid)
+            {
+                var existing = await dbcontext.Recipes.FindAsync(recipe.Id);
+                if (existing == null)
+                    return NotFound();
+
+                // ✅ Sirf allowed fields update karo
+                existing.Name = recipe.Name;
+                existing.Category = recipe.Category;
+                existing.Ingredients = recipe.Ingredients;
+                existing.Procedure = recipe.Procedure;
+                existing.IsFree = recipe.IsFree;
+
+                // ✅ Agar nayi image select ki hai to update karo
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    string folder = "images/recipes/";
+                    string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                    string fullPath = Path.Combine(webHostEnvironment.WebRootPath, folder, fileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    existing.ImagePath = "/" + folder + fileName;
+                }
+
+                // ✅ Database update karo
+                await dbcontext.SaveChangesAsync();
+
+                TempData["Success"] = "Product updated successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(recipe);
+        }
+
+        // ============================================================
+        // 6️⃣ DELETE - Product delete karna (POST)
+        // ============================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await dbcontext.Recipes.FindAsync(id);
+            if (product != null)
+            {
+                dbcontext.Recipes.Remove(product);
+                await dbcontext.SaveChangesAsync();
+                TempData["Success"] = "Product deleted successfully!";
+            }
             return RedirectToAction(nameof(Index));
         }
-        catch (Exception ex)
-        {
-            ModelState.AddModelError("", $"Error: {ex.Message}");
-            return View(model);
-        }
-    }
-
-    // ===== DELETE =====
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            await _productService.DeleteAsync(id, HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>());
-            TempData["Success"] = "Product deleted successfully!";
-        }
-        catch (Exception ex)
-        {
-            TempData["Error"] = $"Delete failed: {ex.Message}";
-        }
-
-        return RedirectToAction(nameof(Index));
     }
 }

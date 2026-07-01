@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Ice_Cream_Parlour_Eproject.Models.Entities
+namespace Ice_Cream_Parlour_Eproject.Areas.Models
 {
     public class Customer
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ice_Cream_Parlour_Eproject.Data;
-using Ice_Cream_Parlour_Eproject.Models.Entities;
-using Ice_Cream_Parlour_Eproject.Models.ViewModels;
 using Ice_Cream_Parlour_Eproject.Services.Interfaces;
+using Ice_Cream_Parlour_Eproject.Areas.Models;
+using Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels;
 
 namespace Ice_Cream_Parlour_Eproject.Services
 {

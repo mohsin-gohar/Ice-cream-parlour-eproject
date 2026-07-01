@@ -1,8 +1,8 @@
-﻿using Ice_Cream_Parlour_Eproject.Models.Report;
+﻿using Ice_Cream_Parlour_Eproject.Models;
 using System;
 using System.Collections.Generic;
 
-namespace Ice_Cream_Parlour_Eproject.Models
+namespace Ice_Cream_Parlour_Eproject.Areas.Models.Report
 {
     // ===== PDF INVOICE MODEL =====
     public class InvoicePdfModel

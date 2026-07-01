@@ -1,4 +1,4 @@
-﻿namespace Ice_Cream_Parlour_Eproject.Models.Enums
+﻿namespace Ice_Cream_Parlour_Eproject.Areas.Models.Enums
 {
     public enum PaymentStatus
     {

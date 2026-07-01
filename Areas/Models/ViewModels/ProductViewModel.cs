@@ -1,8 +1,7 @@
-﻿using Ice_Cream_Parlour_Eproject.Models.Entities;
-using Ice_Cream_Parlour_Eproject.Models.ViewModels;
+﻿using Ice_Cream_Parlour_Eproject.Areas.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Ice_Cream_Parlour_Eproject.Models
+namespace Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels
 {
     public class ProductViewModel
     {
@@ -46,6 +45,9 @@ namespace Ice_Cream_Parlour_Eproject.Models
         public string? SearchTerm { get; internal set; }
         public int? CategoryFilter { get; internal set; }
         public string ProductCode { get; internal set; }
+        public string? Category { get; set; }
+        public string? ImagePath { get; set; }
+        public bool IsFree { get; set; }
     }
 
  }

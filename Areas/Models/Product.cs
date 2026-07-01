@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Ice_Cream_Parlour_Eproject.Models.Entities
+namespace Ice_Cream_Parlour_Eproject.Areas.Models
 {
     public class Product
     {

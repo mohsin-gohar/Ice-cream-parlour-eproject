@@ -1,101 +1,85 @@
-@using Ice_Cream_Parlour_Eproject.Models
-@using Ice_Cream_Parlour_Eproject.Models.Entities
-@model ProductViewModel
+@model Ice_Cream_Parlour_Eproject.Models.ProductViewModel
 @{
     ViewData["Title"] = "Products";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="page-header">
-    <div>
-        <h2>Product Management</h2>
-        <p>Manage ice cream products, stock and pricing</p>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Product Management</h2>
+            <p class="text-muted">Manage ice cream products, recipes and pricing</p>
+        </div>
+        <a asp-action="CreateProduct" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Product
+        </a>
     </div>
-    <a asp-action="Create" class="btn btn-primary-custom"><i class="fas fa-plus me-2"></i>Add Product</a>
-</div>
 
-<div class="table-card">
-    <div class="table-header">
-        <form method="get" class="d-flex gap-2 flex-wrap">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" name="search" value="@Model.SearchTerm" placeholder="Search products..." />
-            </div>
-            <select name="categoryId" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
-                <option value="">All Categories</option>
-                @foreach (var cat in ViewBag.Categories as List<Category> ?? new List<Category>())
-                {
-                    <option value="@cat.Id" selected="@(Model.CategoryFilter == cat.Id)">@cat.Name</option>
-                }
-            </select>
-        </form>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-premium mb-0">
-            <thead>
-                <tr><th>Product</th><th>Category</th><th>Price</th><th>Discount</th><th>Stock</th><th>Barcode</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-                @foreach (var p in Model.Products.Items)
-                {
-                    <tr>
-                        <td data-label="Product">
-                            <div class="d-flex align-items-center gap-2">
-                                @if (p.ExistingImages.Any())
-                                {
-                                    <img src="@p.ExistingImages.First()" class="avatar" alt="@p.Name" />
-                                }
-                                else
-                                {
-                                    <div class="avatar-placeholder"><i class="fas fa-ice-cream"></i></div>
-                                }
-                                <div>
-                                    <strong>@p.Name</strong>
-                                    @if (p.StockQuantity <= p.LowStockThreshold)
-                                    {
-                                        <br /><small class="text-danger"><i class="fas fa-exclamation-circle"></i> Low stock</small>
-                                    }
-                                </div>
-                            </div>
-                        </td>
-                        <td data-label="Category">@p.CategoryName</td>
-                        <td data-label="Price">
-                            @if (p.DiscountPercent > 0)
-                            {
-                                <del class="text-muted">$@p.Price.ToString("N2")</del>
-                                <strong class="text-success">$@p.FinalPrice.ToString("N2")</strong>
-                            }
-                            else
-                            {
-                                <text>$@p.Price.ToString("N2")</text>
-                            }
-                        </td>
-                        <td data-label="Discount">@(p.DiscountPercent > 0 ? $"{p.DiscountPercent}%" : "-")</td>
-                        <td data-label="Stock">@p.StockQuantity</td>
-                        <td data-label="Barcode"><code>@(p.Barcode ?? "-")</code></td>
-                        <td data-label="Status"><span class="badge-status badge-@p.Status.ToString().ToLower()">@p.Status</span></td>
-                        <td data-label="Actions">
-                            <a asp-action="Edit" asp-route-id="@p.Id" class="btn-action edit"><i class="fas fa-edit"></i></a>
-                            <form asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn-action delete" data-confirm-delete="Delete this product?"><i class="fas fa-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    @if (Model.Products.TotalPages > 1)
+    @if (TempData["Success"] != null)
     {
-        <div class="p-3">
-            <ul class="pagination pagination-custom justify-content-center mb-0">
-                @for (int i = 1; i <= Model.Products.TotalPages; i++)
-                {
-                    <li class="page-item @(i == Model.Products.Page ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@Model.SearchTerm" asp-route-categoryId="@Model.CategoryFilter">@i</a>
-                    </li>
-                }
-            </ul>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Products.Items)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                                    {
+                                        <img src="@item.ImagePath" style="width:50px; height:50px; object-fit:cover; border-radius:8px;" />
+                                    }
+                                    else
+                                    {
+                                        <div style="width:50px; height:50px; background:#f0f0f0; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                                            <i class="fas fa-ice-cream text-muted"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td><strong>@item.Name</strong></td>
+                                <td><span class="badge bg-info">@item.Category</span></td>
+                                <td>
+                                    @if (item.IsFree)
+                                    {
+                                        <span class="badge bg-success">Free</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Premium</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="EditProduct" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="DeleteProduct" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this product?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

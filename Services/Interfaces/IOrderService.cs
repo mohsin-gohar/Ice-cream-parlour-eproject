@@ -1,4 +1,5 @@
-﻿using Ice_Cream_Parlour_Eproject.Models;
+﻿using Ice_Cream_Parlour_Eproject.Areas.Models.Enums;
+using Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels;
 
 namespace Ice_Cream_Parlour_Eproject.Services
 {

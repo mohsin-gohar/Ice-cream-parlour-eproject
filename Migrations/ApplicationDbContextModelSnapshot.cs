@@ -58,7 +58,7 @@ namespace Ice_Cream_Parlour_Eproject.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Entities.Category", b =>
+            modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,9 +66,15 @@ namespace Ice_Cream_Parlour_Eproject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -78,6 +84,48 @@ namespace Ice_Cream_Parlour_Eproject.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedDate = new DateTime(2026, 6, 30, 16, 14, 3, 257, DateTimeKind.Local).AddTicks(3562),
+                            Description = "Traditional ice cream flavors like Vanilla, Chocolate",
+                            IsActive = true,
+                            Name = "Classic"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedDate = new DateTime(2026, 6, 30, 16, 14, 3, 257, DateTimeKind.Local).AddTicks(3573),
+                            Description = "Fresh fruit based ice creams like Strawberry, Mango",
+                            IsActive = true,
+                            Name = "Fruit"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedDate = new DateTime(2026, 6, 30, 16, 14, 3, 257, DateTimeKind.Local).AddTicks(3575),
+                            Description = "Luxury and gourmet flavors",
+                            IsActive = true,
+                            Name = "Premium"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedDate = new DateTime(2026, 6, 30, 16, 14, 3, 257, DateTimeKind.Local).AddTicks(3577),
+                            Description = "Seasonal and limited edition flavors",
+                            IsActive = true,
+                            Name = "Special"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedDate = new DateTime(2026, 6, 30, 16, 14, 3, 257, DateTimeKind.Local).AddTicks(3578),
+                            Description = "Healthy sugar-free options for diabetics",
+                            IsActive = true,
+                            Name = "Sugar Free"
+                        });
                 });
 
             modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Entities.Customer", b =>
@@ -220,7 +268,7 @@ namespace Ice_Cream_Parlour_Eproject.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Entities.Product", b =>
@@ -673,8 +721,8 @@ namespace Ice_Cream_Parlour_Eproject.Migrations
 
             modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Entities.Product", b =>
                 {
-                    b.HasOne("Ice_Cream_Parlour_Eproject.Models.Entities.Category", "Category")
-                        .WithMany("Products")
+                    b.HasOne("Ice_Cream_Parlour_Eproject.Models.Category", "Category")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -731,11 +779,6 @@ namespace Ice_Cream_Parlour_Eproject.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Entities.Category", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Ice_Cream_Parlour_Eproject.Models.Entities.Customer", b =>

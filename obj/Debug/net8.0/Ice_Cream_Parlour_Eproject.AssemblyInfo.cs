@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ice_Cream_Parlour_Eproject")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+40bf3d3c9c6525fdfd90174190b502868e132b08")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e72bb2f5b0496243f94551f3afe141fb5fc26a94")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ice_Cream_Parlour_Eproject")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ice_Cream_Parlour_Eproject")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

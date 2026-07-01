@@ -101,9 +101,9 @@
 </div>
 
 @section Scripts {
-<script>
-    var labels = @Html.Raw(Model.RevenueChartLabels);
-    var data = @Html.Raw(Model.RevenueChartData);
-    createRevenueChart('revenueChart', labels, data);
-</script>
+    <script>
+        var labels = @Html.Raw(Model.RevenueChartLabels);
+        var data = @Html.Raw(Model.RevenueChartData);
+        createRevenueChart('revenueChart', labels, data);
+    </script>
 }

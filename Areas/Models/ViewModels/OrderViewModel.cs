@@ -1,7 +1,7 @@
-﻿using Ice_Cream_Parlour_Eproject.Models.ViewModels;
+﻿using Ice_Cream_Parlour_Eproject.Areas.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace Ice_Cream_Parlour_Eproject.Models
+namespace Ice_Cream_Parlour_Eproject.Areas.Models.ViewModels
 {
     public class OrderViewModel
     {
